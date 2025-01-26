@@ -14,7 +14,7 @@ const projects = [
     category: "E-commerce & Booking",
     year: "2024",
     description: "An immersive digital experience for premium hospitality",
-    image: "/projectDemo.svg",
+    image: "/ci.png",
     link: "/projects/resort",
     // codeLink: "/code/resort",
   },
@@ -24,7 +24,7 @@ const projects = [
     category: "Financial Technology",
     year: "2023",
     description: "Redefining wealth management for the digital age",
-    image: "/projectDemo.svg",
+    image: "/cb.png",
     link: "/projects/banking",
   },
   {
