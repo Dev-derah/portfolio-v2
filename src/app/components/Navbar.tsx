@@ -12,9 +12,9 @@ const NavBar = () => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isIndicatorActive, setIsIndicatorActive] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeNavItem, setActiveNavItem] = useState(null);
-  const audioElementRef = useRef(null);
-  const navContainerRef = useRef(null);
+  const [activeNavItem, setActiveNavItem] = useState<number | null>(null);
+  const audioElementRef = useRef<HTMLAudioElement | null>(null);
+  const navContainerRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef(null);
   const { y: currentScrollY } = useWindowScroll();
   const [isNavVisible, setIsNavVisible] = useState(true);
@@ -25,7 +25,7 @@ const NavBar = () => {
     setIsIndicatorActive((prev) => !prev);
   };
 
-  const handleNavItemHover = (index, isEntering) => {
+  const handleNavItemHover = (index: number, isEntering: boolean) => {
     if (isEntering) {
       setActiveNavItem(index);
       const target = document.querySelector(`#nav-item-${index}`);
@@ -114,24 +114,26 @@ const NavBar = () => {
 
   useEffect(() => {
     if (isAudioPlaying) {
-      audioElementRef.current.play();
+      audioElementRef.current?.play().catch(() => setIsAudioPlaying(false));
     } else {
-      audioElementRef.current.pause();
+      audioElementRef.current?.pause();
     }
   }, [isAudioPlaying]);
 
   useEffect(() => {
-    if (currentScrollY === 0) {
-      setIsNavVisible(true);
-      navContainerRef.current.classList.remove("floating-nav");
-    } else if (currentScrollY > lastScrollY) {
-      setIsNavVisible(false);
-      navContainerRef.current.classList.add("floating-nav");
-    } else if (currentScrollY < lastScrollY) {
-      setIsNavVisible(true);
-      navContainerRef.current.classList.add("floating-nav");
+    if (navContainerRef) {
+      if (currentScrollY === 0) {
+        setIsNavVisible(true);
+        navContainerRef.current?.classList.remove("floating-nav");
+      } else if (currentScrollY > lastScrollY) {
+        setIsNavVisible(false);
+        navContainerRef.current?.classList.add("floating-nav");
+      } else if (currentScrollY < lastScrollY) {
+        setIsNavVisible(true);
+        navContainerRef.current?.classList.add("floating-nav");
+      }
+      setLastScrollY(currentScrollY);
     }
-    setLastScrollY(currentScrollY);
   }, [currentScrollY, lastScrollY]);
 
   useEffect(() => {
@@ -216,7 +218,7 @@ const NavBar = () => {
                   href="/contact"
                   className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-[#2C3539] px-5 py-2 text-sm text-[#F3F3EF] transition-all duration-300 hover:bg-[#1A1A1A] hover:shadow-md hover:scale-105 group"
                 >
-                  Let's Talk
+                  Let&apos;s Talk
                   <MdChevronRight className="text-lg transition-transform duration-300 group-hover:translate-x-0.5" />
                 </a>
 

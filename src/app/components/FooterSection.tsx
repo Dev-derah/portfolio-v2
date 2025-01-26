@@ -2,17 +2,21 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { FiGithub, FiTwitter, FiLinkedin, FiMail } from "react-icons/fi";
+import { FiGithub, FiTwitter, FiLinkedin } from "react-icons/fi";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const FooterSection = () => {
-  const sectionRef = useRef(null);
-  const headlineRef = useRef(null);
-  const headlineWordsRef = useRef([]);
-  const socialRef = useRef(null);
+const FooterSection: React.FC = () => {
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const headlineRef = useRef<HTMLDivElement | null>(null);
+  const headlineWordsRef = useRef<HTMLSpanElement[]>([]);
+  const socialRef = useRef<HTMLDivElement | null>(null);
+  const circleRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (!sectionRef.current || !headlineRef.current || !socialRef.current)
+      return;
+
     const ctx = gsap.context(() => {
       // Headline animation using words
       gsap.from(headlineWordsRef.current, {
@@ -27,19 +31,8 @@ const FooterSection = () => {
         ease: "power4.out",
       });
 
-      gsap.from(".email-button", {
-        scrollTrigger: {
-          trigger: ".email-button",
-          start: "top 90%",
-        },
-        opacity: 0,
-        y: 20,
-        duration: 1,
-        ease: "power2.out",
-      });
-
       // Social links stagger animation
-      gsap.from(socialRef.current.children, {
+      gsap.from(Array.from(socialRef.current!.children), {
         scrollTrigger: {
           trigger: socialRef.current,
           start: "top 90%",
@@ -52,19 +45,20 @@ const FooterSection = () => {
       });
 
       // Background circle animation
-      const circle = document.querySelector(".animated-circle");
-      gsap.to(circle, {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top center",
-          scrub: 1,
-        },
-        rotation: 360,
-        duration: 4,
-        ease: "none",
-        repeat: -1,
-      });
-    });
+      if (circleRef.current) {
+        gsap.to(circleRef.current, {
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top center",
+            scrub: 1,
+          },
+          rotation: 360,
+          duration: 4,
+          ease: "none",
+          repeat: -1,
+        });
+      }
+    }, sectionRef);
 
     return () => ctx.revert();
   }, []);
@@ -78,7 +72,13 @@ const FooterSection = () => {
       ref={sectionRef}
       className="relative bg-[#F3F3EF] pt-32 pb-20 px-6 overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="absolute inset-0">
+        <div
+          ref={circleRef}
+          className="animated-circle w-[500px] h-full rounded-full border border-gray-400 border-dashed opacity-50 absolute -top-40 left-1/2 transform -translate-x-1/2"
+        />
+      </div>
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Main headline */}
         <h2
           ref={headlineRef}
@@ -88,7 +88,9 @@ const FooterSection = () => {
             {headlineWords.map((word, index) => (
               <span
                 key={index}
-                ref={(el) => (headlineWordsRef.current[index] = el)}
+                ref={(el) => {
+                  if (el) headlineWordsRef.current[index] = el;
+                }}
                 className="relative inline-block mr-[0.25em] mb-2"
               >
                 {word}
@@ -106,8 +108,7 @@ const FooterSection = () => {
             href="mailto:derah.dev@gmail.com"
             className="px-6 cursor-pointer py-3 bg-[#1A1A1A] text-white text-xl rounded-md hover:bg-[#333333] transition-colors duration-300"
           >
-            <FiMail className="inline-block mr-2" />
-            derah.dev@gmail.com
+            Email me
           </a>
         </div>
 

@@ -11,45 +11,49 @@ import Link from "next/link";
 gsap.registerPlugin(ScrollTrigger);
 
 const AboutSection = () => {
-  const sectionRef = useRef(null);
-  const gridRef = useRef(null);
-  const headingRef = useRef(null);
-  const subtitleRef = useRef(null);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
+  const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const subtitleRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Header animation
-      gsap.from(headingRef.current, {
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        ease: "power3.out",
-      });
+      if (headingRef.current) {
+        gsap.from(headingRef.current, {
+          y: 50,
+          opacity: 0,
+          duration: 1,
+          ease: "power3.out",
+        });
+      }
 
-      gsap.from(subtitleRef.current, {
-        y: 30,
-        opacity: 0,
-        duration: 1,
-        delay: 0.3,
-        ease: "power3.out",
-      });
+      if (subtitleRef.current) {
+        gsap.from(subtitleRef.current, {
+          y: 30,
+          opacity: 0,
+          duration: 1,
+          delay: 0.3,
+          ease: "power3.out",
+        });
+      }
 
-      // Cards entry animation with staggered effect and scale
-      const gridItems = gridRef.current.children;
-      gsap.from(gridItems, {
-        y: 100,
-        scale: 0.9,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.15,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: gridRef.current,
-          start: "top bottom-=100",
-          toggleActions: "play none none reverse",
-        },
-      });
-    }, sectionRef);
+      if (gridRef.current) {
+        const gridItems = gridRef.current.children;
+        gsap.from(gridItems, {
+          y: 100,
+          scale: 0.9,
+          opacity: 0,
+          duration: 1,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: "top bottom-=100",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
+    });
 
     return () => ctx.revert();
   }, []);
@@ -64,10 +68,7 @@ const AboutSection = () => {
           <h2 className="font-['EB_Garamond'] text-6xl md:text-9xl text-[#1A1A1A] mb-8 leading-tight lg:text-8xl">
             About
           </h2>
-          <p
-            ref={subtitleRef}
-            className="text-primary-800 text-lg max-w-2xl"
-          >
+          <p ref={subtitleRef} className="text-primary-800 text-lg max-w-2xl">
             Crafting exceptional digital experiences through innovative web
             development and thoughtful design.
           </p>

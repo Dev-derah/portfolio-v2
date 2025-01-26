@@ -9,49 +9,51 @@ import { FaGithub } from "react-icons/fa";
 gsap.registerPlugin(ScrollTrigger);
 
 const DemoSection = () => {
-  const sectionRef = useRef(null);
-  const gridRef = useRef(null);
+const sectionRef = useRef<HTMLDivElement | null>(null);
+const gridRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Animate grid items on scroll
-      const gridItems = gridRef.current.children;
-      gsap.from(gridItems, {
-        y: 100,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: gridRef.current,
-          start: "top bottom",
-          end: "center center",
-          scrub: 1,
-        },
-      });
-
-      // Hover animations for grid items
-      [...gridItems].forEach((item) => {
-        const highlight = item.querySelector(".highlight");
-
-        item.addEventListener("mouseenter", () => {
-          gsap.to(highlight, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.4,
-            ease: "power2.out",
-          });
+      if (gridRef.current) {
+        const gridItems = gridRef.current.children;
+        gsap.from(gridItems, {
+          y: 100,
+          opacity: 0,
+          duration: 1,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: "top bottom",
+            end: "center center",
+            scrub: 1,
+          },
         });
 
-        item.addEventListener("mouseleave", () => {
-          gsap.to(highlight, {
-            opacity: 0,
-            scale: 0.8,
-            duration: 0.4,
-            ease: "power2.in",
+        // Hover animations for grid items
+        [...gridItems].forEach((item) => {
+          const highlight = item.querySelector(".highlight");
+
+          item.addEventListener("mouseenter", () => {
+            gsap.to(highlight, {
+              opacity: 1,
+              scale: 1,
+              duration: 0.4,
+              ease: "power2.out",
+            });
+          });
+
+          item.addEventListener("mouseleave", () => {
+            gsap.to(highlight, {
+              opacity: 0,
+              scale: 0.8,
+              duration: 0.4,
+              ease: "power2.in",
+            });
           });
         });
-      });
+      }
     }, sectionRef);
 
     return () => ctx.revert();

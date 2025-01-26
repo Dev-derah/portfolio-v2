@@ -4,167 +4,130 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MdArrowOutward, MdCode } from "react-icons/md";
 import Image from "next/image";
+import { projects } from "@/data/projects";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const projects = [
-  {
-    id: 1,
-    title: "Luxury Resort Platform",
-    category: "E-commerce & Booking",
-    year: "2024",
-    description: "An immersive digital experience for premium hospitality",
-    image: "/ci.png",
-    link: "/projects/resort",
-    // codeLink: "/code/resort",
-  },
-  {
-    id: 2,
-    title: "Private Banking Interface",
-    category: "Financial Technology",
-    year: "2023",
-    description: "Redefining wealth management for the digital age",
-    image: "/cb.png",
-    link: "/projects/banking",
-  },
-  {
-    id: 3,
-    title: "Premium Auto Configurator",
-    category: "3D & Interactive",
-    year: "2023",
-    description: "Crafting the future of automotive customization",
-    image: "/projectDemo.svg",
-    link: "/projects/auto",
-    // codeLink: "/code/auto",
-  },
-];
-
 const FeaturedProjects = () => {
-  const [activeProject, setActiveProject] = useState(null);
-  const sectionRef = useRef(null);
-  const headerRef = useRef(null);
-  const projectRefs = useRef([]);
+  const [activeProject, setActiveProject] = useState<number | null>(null);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const projectRefs = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Header animation with improved split text
-      const headerText = headerRef.current.querySelector("h2");
-      const chars = headerText.textContent.split("");
-      headerText.textContent = "";
-      chars.forEach((char) => {
-        const span = document.createElement("span");
-        span.textContent = char === " " ? "\u00A0" : char;
-        span.style.opacity = "0";
-        span.style.transform = "translateY(50px)";
-        span.style.display = "inline-block";
-        headerText.appendChild(span);
+      if (headerRef.current) {
+        // Header animation with split text
+        const headerText = headerRef.current.querySelector("h2");
+        if (headerText) {
+          const chars = headerText.textContent?.split("") || [];
+          headerText.textContent = "";
+          chars.forEach((char) => {
+            const span = document.createElement("span");
+            span.textContent = char === " " ? "\u00A0" : char;
+            span.style.opacity = "0";
+            span.style.transform = "translateY(50px)";
+            span.style.display = "inline-block";
+            headerText.appendChild(span);
+          });
+
+          gsap.to(headerText.children, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            stagger: 0.03,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: "top 80%",
+            },
+          });
+        }
+      }
+
+      projectRefs.current.forEach((project) => {
+        const category =
+          project.querySelector<HTMLElement>(".project-category");
+        const title = project.querySelector<HTMLElement>(".project-title");
+        const description = project.querySelector<HTMLElement>(
+          ".project-description"
+        );
+        const cta = project.querySelector<HTMLElement>(".project-cta");
+        const code = project.querySelector<HTMLElement>(".project-code");
+        const imageContainer = project.querySelector<HTMLElement>(
+          ".project-image-container"
+        );
+        const imageInner = project.querySelector<HTMLElement>(
+          ".project-image-inner"
+        );
+
+        if (category && title && description && cta && code && imageContainer) {
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: project,
+              start: "top 65%",
+              end: "bottom top",
+              toggleActions: "play none none none",
+            },
+          });
+
+          // Set initial states
+          gsap.set([category, title, description, cta, code], {
+            opacity: 0,
+            y: 30,
+          });
+          gsap.set(imageContainer, {
+            clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)",
+          });
+
+          // Animate project reveal
+          tl.to(imageContainer, {
+            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+            duration: 1.2,
+            ease: "power4.inOut",
+          })
+            .to(
+              category,
+              { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
+              "-=0.8"
+            )
+            .to(
+              title,
+              { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
+              "-=0.6"
+            )
+            .to(
+              description,
+              { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
+              "-=0.6"
+            )
+            .to(
+              [cta, code],
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: "power3.out",
+              },
+              "-=0.6"
+            );
+
+          // Smooth parallax effect
+          if (imageInner) {
+            gsap.to(imageInner, {
+              y: "0%",
+              ease: "none",
+              scrollTrigger: {
+                trigger: project,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1.5,
+              },
+            });
+          }
+        }
       });
-
-      gsap.to(headerText.children, {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        stagger: 0.03,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: headerRef.current,
-          start: "top 80%",
-        },
-      });
-
-      projectRefs.current.forEach((project, index) => {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: project,
-            start: "top 65%",
-            end: "bottom top",
-            toggleActions: "play none none none",
-          },
-        });
-
-        // Set initial states
-        gsap.set(project.querySelector(".project-category"), {
-          opacity: 0,
-          y: 30,
-        });
-        gsap.set(project.querySelector(".project-title"), {
-          opacity: 0,
-          y: 50,
-        });
-        gsap.set(project.querySelector(".project-description"), {
-          opacity: 0,
-          y: 30,
-        });
-        gsap.set(project.querySelector(".project-cta"), { opacity: 0, y: 20 });
-        gsap.set(project.querySelector(".project-code"), { opacity: 0, y: 20 });
-        gsap.set(project.querySelector(".project-image-container"), {
-          clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)",
-        });
-
-        // Animate project reveal
-        tl.to(project.querySelector(".project-image-container"), {
-          clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-          duration: 1.2,
-          ease: "power4.inOut",
-        })
-          .to(
-            project.querySelector(".project-category"),
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.8,
-              ease: "power3.out",
-            },
-            "-=0.8"
-          )
-          .to(
-            project.querySelector(".project-title"),
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.8,
-              ease: "power3.out",
-            },
-            "-=0.6"
-          )
-          .to(
-            project.querySelector(".project-description"),
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.8,
-              ease: "power3.out",
-            },
-            "-=0.6"
-          )
-          .to(
-            [
-              project.querySelector(".project-cta"),
-              project.querySelector(".project-code"),
-            ],
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.8,
-              stagger: 0.1,
-              ease: "power3.out",
-            },
-            "-=0.6"
-          );
-
-        // Smooth parallax effect
-        gsap.to(project.querySelector(".project-image-inner"), {
-          y: "0%",
-          ease: "none",
-          scrollTrigger: {
-            trigger: project,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1.5,
-          },
-        });
-      });
-    });
+    }, sectionRef);
 
     return () => ctx.revert();
   }, []);
@@ -186,7 +149,9 @@ const FeaturedProjects = () => {
         {projects.map((project, index) => (
           <div
             key={project.id}
-            ref={(el) => (projectRefs.current[index] = el)}
+            ref={(el) => {
+              if (el) projectRefs.current[index] = el;
+            }}
             className="mb-40 last:mb-0 group"
             onMouseEnter={() => setActiveProject(project.id)}
             onMouseLeave={() => setActiveProject(null)}

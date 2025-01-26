@@ -7,11 +7,11 @@ import gsap from "gsap";
 const HeroSection = () => {
   const [hovered, setHovered] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
-  const containerRef = useRef(null);
-  const hoverTimerRef = useRef(null);
-  const videoContainerRef = useRef(null);
-  const highlightedTextRef = useRef(null);
-  const overlayRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const videoContainerRef = useRef<HTMLDivElement | null>(null);
+  const highlightedTextRef = useRef<HTMLSpanElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -156,7 +156,7 @@ const HeroSection = () => {
       }
     };
   }, []);
-  const splitTitle = (text) => {
+  const splitTitle = (text:string) => {
     return text.split(" ").map((word, i) => (
       <span key={i} className="word inline-block overflow-hidden">
         <span className="inline-block">
